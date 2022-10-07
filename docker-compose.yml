@@ -1,0 +1,18 @@
+version: "3"
+services:
+  drom-postgres:
+    container_name: "drom-postgres"
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - "/etc/postgresql"
+      - "/var/log/postgresql"
+      - "/var/lib/postgresql"
+    environment:
+      POSTGRES_HOST: drom-postgres
+      POSTGRES_PASSWORD: pass
+      POSTGRES_USER: user
+      POSTGRES_DB: db
+    ports:
+      - 5432:5432
