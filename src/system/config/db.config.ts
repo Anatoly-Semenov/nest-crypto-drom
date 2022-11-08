@@ -6,16 +6,24 @@ const DatabaseConfig = () => ({
   password: process.env.POSTGRES_PASSWORD,
   database: process.env.POSTGRES_DB,
   cli: {
-    migrationsDir: 'src/common/migrations',
+    migrationsDir: 'src/system/migrations',
   },
   synchronize: true,
   autoLoadEntities: true,
   entities: ['dist/**/entities/*.entity{.ts,.js}'],
   migrationsTableName: 'migrations',
-  migrations: ['dist/common/migrations/*{.ts,.js}'],
+  migrations: ['dist/system/migrations/*{.ts,.js}'],
   migrationsRun: process.env.MODE === 'PROD',
-  cache: true,
+  cache: false,
   ssl: false,
+  logging: [],
+  extra: {
+    // based on  https://node-postgres.com/api/pool
+    // max connection pool size
+    max: 80,
+    // connection timeout
+    // connectionTimeoutMillis: 10000,
+  },
 });
 
 export default DatabaseConfig;

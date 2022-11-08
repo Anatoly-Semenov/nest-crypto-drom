@@ -1,7 +1,7 @@
 export class CreateCarDto {
-  brand: string;
+  brand_id: number;
 
-  model: string;
+  model_id: number;
 
   year: number;
 
@@ -14,11 +14,17 @@ export class CreateCarDto {
   //   usdt: number;
   // };
 
-  color: string;
+  color_id: number;
 
   // region_id: number;
 
   price_rub: number | null;
 
   img_preview: string;
+
+  constructor(partial?: Partial<CreateCarDto>) {
+    if (partial) {
+      Object.assign(this, partial);
+    }
+  }
 }

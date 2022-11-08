@@ -12,25 +12,31 @@ import {
 import { CarsService } from './cars-service.service';
 
 // DTO
-import { CreateCarDto } from './dto/create-car.dto';
-import { UpdateCarDto } from './dto/update-car.dto';
+import {
+  CreateCarDto,
+  UpdateCarDto,
+  ResponseCarDto,
+  ResponseColorDto,
+  ResponseBrandDto,
+  ResponseModelDto,
+} from './dto';
 
 @Controller('cars-service')
 export class CarsServiceController {
   constructor(private carsService: CarsService) {}
 
   @Get('/cars')
-  getCarsList() {
-    return this.carsService.getList();
+  getCarsList(): Promise<ResponseCarDto[]> {
+    return this.carsService.getCarsList();
   }
 
   @Get('/cars/:id')
-  getCarDetail(@Param('id') id: string) {
-    return this.carsService.getDetail(id);
+  getCarDetail(@Param('id') id: string): Promise<ResponseCarDto> {
+    return this.carsService.getCarDetail(id);
   }
 
   @Post('/cars')
-  createCar(@Body() carBody: CreateCarDto) {
+  createCar(@Body() carBody: CreateCarDto): Promise<ResponseCarDto> {
     return this.carsService.createCar(carBody);
   }
 
@@ -38,12 +44,27 @@ export class CarsServiceController {
   updateCar(
     @Param('id') id: string,
     @Body() carBody: UpdateCarDto,
-  ): Promise<any> {
+  ): Promise<ResponseCarDto> {
     return this.carsService.updateCar(id, carBody);
   }
 
   @Delete('/cars/:id')
-  deleteCar(@Param('id') id: string) {
+  deleteCar(@Param('id') id: string): Promise<string> {
     return this.carsService.deleteCar(id);
+  }
+
+  @Get('/colors')
+  getColorsList(): Promise<ResponseColorDto[]> {
+    return this.carsService.getColorsList();
+  }
+
+  @Get('/brands')
+  getBrandsList(): Promise<ResponseBrandDto[]> {
+    return this.carsService.getBrandsList();
+  }
+
+  @Get('/models')
+  getModelsList(): Promise<ResponseModelDto[]> {
+    return this.carsService.getModelsList();
   }
 }
