@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { Car } from './car.entity';
 
 @Entity()
 export class Color {
@@ -10,4 +11,7 @@ export class Color {
 
   @Column()
   hex: string;
+
+  @OneToMany(() => Car, (car) => car.color)
+  cars: Car[];
 }
