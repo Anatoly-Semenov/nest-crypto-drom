@@ -4,7 +4,12 @@ import {
   Column,
   UpdateDateColumn,
   CreateDateColumn,
+  ManyToMany,
 } from 'typeorm';
+
+import { Brand } from './brand.entity';
+import { Model } from './model.entity';
+import { Color } from './color.entity';
 
 @Entity()
 export class Car {
@@ -12,10 +17,12 @@ export class Car {
   id: number;
 
   @Column()
-  brand: string;
+  @ManyToMany(() => Brand, (brand) => brand.id)
+  brand_id: number;
 
   @Column()
-  model: string;
+  @ManyToMany(() => Model, (brand) => brand.id)
+  model_id: number;
 
   @Column()
   year: number;
@@ -24,7 +31,8 @@ export class Car {
   hp: number;
 
   @Column()
-  color: string;
+  @ManyToMany(() => Color, (color) => color.id)
+  color_id: number;
 
   @Column({ nullable: true })
   price_rub: number;
@@ -32,9 +40,9 @@ export class Car {
   @Column()
   img_preview: string;
 
-  @UpdateDateColumn()
-  updatedAt?: Date;
-
   @CreateDateColumn()
-  createdAt?: Date;
+  created_at?: Date;
+
+  @UpdateDateColumn()
+  updated_at?: Date;
 }
