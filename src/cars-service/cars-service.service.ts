@@ -20,7 +20,9 @@ export class CarsService {
 
   async getCarsList(): Promise<ResponseCarDto[]> {
     try {
-      const cars = await this.carRepository.find();
+      const cars = await this.carRepository.find({
+        relations: ['model', 'brand', 'color'],
+      });
 
       return cars.map((car) => new ResponseCarDto(car));
     } catch (error) {

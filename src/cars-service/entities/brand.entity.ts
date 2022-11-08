@@ -4,7 +4,10 @@ import {
   Column,
   UpdateDateColumn,
   CreateDateColumn,
+  OneToMany,
 } from 'typeorm';
+import { Model } from './model.entity';
+import { Car } from './car.entity';
 
 @Entity()
 export class Brand {
@@ -13,6 +16,12 @@ export class Brand {
 
   @Column()
   name: string;
+
+  @OneToMany(() => Model, (model) => model.brand)
+  model: Model[];
+
+  @OneToMany(() => Car, (car) => car.brand)
+  cars: Car[];
 
   @UpdateDateColumn()
   updated_at?: Date;

@@ -4,7 +4,7 @@ import {
   Column,
   UpdateDateColumn,
   CreateDateColumn,
-  ManyToMany,
+  ManyToOne,
 } from 'typeorm';
 
 import { Brand } from './brand.entity';
@@ -16,23 +16,20 @@ export class Car {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
-  @ManyToMany(() => Brand, (brand) => brand.id)
-  brand_id: number;
+  @ManyToOne(() => Brand, (brand) => brand.id)
+  brand: number;
 
-  @Column()
-  @ManyToMany(() => Model, (brand) => brand.id)
-  model_id: number;
+  @ManyToOne(() => Model, (model) => model.id)
+  model: number;
+
+  @ManyToOne(() => Color, (color) => color.id)
+  color: number;
 
   @Column()
   year: number;
 
   @Column()
   hp: number;
-
-  @Column()
-  @ManyToMany(() => Color, (color) => color.id)
-  color_id: number;
 
   @Column({ nullable: true })
   price_rub: number;
