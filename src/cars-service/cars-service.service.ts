@@ -96,9 +96,11 @@ export class CarsService {
     }
   }
 
-  async getCarDetail(id: string): Promise<ResponseCarDto> {
+  async getCarDetail(id: string | number): Promise<ResponseCarDto> {
     try {
-      const car = await this.carRepository.findByIds([id]);
+      const car = await this.carRepository.findByIds([id], {
+        relations: ['model', 'brand', 'color'],
+      });
 
       return new ResponseCarDto(car[0]);
     } catch (error) {
@@ -117,7 +119,7 @@ export class CarsService {
       const car = await this.carRepository.create(carBody);
       const res = await this.carRepository.save(car);
 
-      return new ResponseCarDto(res);
+      return this.getCarDetail(res.id);
     } catch (error) {
       throw new HttpException(
         {
