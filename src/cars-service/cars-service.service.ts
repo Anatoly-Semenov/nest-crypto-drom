@@ -72,9 +72,15 @@ export class CarsService {
     }
   }
 
-  async getModelsList(): Promise<ResponseModelDto[]> {
+  async getModelsList(brandId: string): Promise<ResponseModelDto[]> {
     try {
-      const models = await this.modelRepository.find();
+      const models = await this.modelRepository.find({
+        where: {
+          brand: {
+            id: brandId,
+          },
+        },
+      });
 
       return models.map((model) => {
         return new ResponseModelDto(model);
