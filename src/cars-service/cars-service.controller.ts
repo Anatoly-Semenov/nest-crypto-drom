@@ -63,8 +63,8 @@ export class CarsServiceController {
     return this.carsService.getBrandsList();
   }
 
-  @Get('/models')
-  getModelsList(): Promise<ResponseModelDto[]> {
-    return this.carsService.getModelsList();
+  @Get('/brands/:id/models')
+  getModelsList(@Param('id') brandId: string): Promise<ResponseModelDto[]> {
+    return this.carsService.getModelsList(brandId);
   }
 }
