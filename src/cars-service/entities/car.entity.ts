@@ -5,6 +5,7 @@ import {
   UpdateDateColumn,
   CreateDateColumn,
   ManyToOne,
+  JoinColumn,
 } from 'typeorm';
 
 import { Brand } from './brand.entity';
@@ -17,13 +18,25 @@ export class Car {
   id: number;
 
   @ManyToOne(() => Brand, (brand) => brand.id)
+  @JoinColumn({ name: 'brand_id' })
   brand: number;
 
+  @Column()
+  brand_id: number;
+
   @ManyToOne(() => Model, (model) => model.id)
+  @JoinColumn({ name: 'model_id' })
   model: number;
 
+  @Column()
+  model_id: number;
+
   @ManyToOne(() => Color, (color) => color.id)
+  @JoinColumn({ name: 'color_id' })
   color: number;
+
+  @Column()
+  color_id: number;
 
   @Column()
   year: number;
