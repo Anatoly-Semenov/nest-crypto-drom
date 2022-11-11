@@ -21,6 +21,7 @@ import {
 // Entities
 import { Car, Color, Brand, Model } from './entities';
 import { ResponseColorDto, ResponseBrandDto, ResponseModelDto } from './dto';
+import { ListResponseDto } from '../system/dto/list-response.dto';
 
 @Injectable()
 export class CarsService {
@@ -31,20 +32,36 @@ export class CarsService {
     @InjectRepository(Model) private modelRepository: Repository<Model>,
   ) {}
 
-  async getCarsList(query: CarsListQueryDto): Promise<ResponseCarDto[]> {
+  async getCarsList(
+    query: CarsListQueryDto,
+  ): Promise<ListResponseDto<ResponseCarDto>> {
     const where = this.getCarsListWhere(query);
     const order = this.getCarsListOrder(query);
 
-    try {
-      const cars = await this.carRepository.find({
-        relations: ['model', 'brand', 'color'],
-        where,
-        order,
-        skip: query.page,
-        take: query.limit,
-      });
+    const { page = 1, limit = 25 } = query;
 
-      return cars.map((car) => new ResponseCarDto(car));
+    try {
+      // @ts-ignore
+      const [cars, total_items]: [cars: ResponseCarDto[], count: number] =
+        await this.carRepository.findAndCount({
+          relations: ['model', 'brand', 'color'],
+          where,
+          order,
+          skip: page,
+          take: limit,
+        });
+
+      const data = cars.map((car) => new ResponseCarDto(car));
+
+      return new ListResponseDto<ResponseCarDto>({
+        data,
+        meta: {
+          page_size: limit,
+          total_items,
+          total_pages: Math.round(total_items / limit),
+          current_page: page,
+        },
+      });
     } catch (error) {
       throw new HttpException(
         {

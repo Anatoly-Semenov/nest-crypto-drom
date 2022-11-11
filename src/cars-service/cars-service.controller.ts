@@ -22,13 +22,16 @@ import {
   ResponseModelDto,
   CarsListQueryDto,
 } from './dto';
+import { ListResponseDto } from '../system/dto/list-response.dto';
 
 @Controller('cars-service')
 export class CarsServiceController {
   constructor(private carsService: CarsService) {}
 
   @Get('/cars')
-  getCarsList(@Query() query: CarsListQueryDto): Promise<ResponseCarDto[]> {
+  getCarsList(
+    @Query() query: CarsListQueryDto,
+  ): Promise<ListResponseDto<ResponseCarDto>> {
     return this.carsService.getCarsList(query);
   }
 
