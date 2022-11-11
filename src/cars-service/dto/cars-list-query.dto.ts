@@ -15,7 +15,7 @@ export class CarsListQueryDto {
 
   @IsOptional()
   @Type(() => Number)
-  readonly offset: number;
+  readonly limit: number;
 
   @IsOptional()
   @Type(() => Number)

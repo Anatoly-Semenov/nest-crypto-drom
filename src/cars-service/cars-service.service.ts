@@ -40,6 +40,8 @@ export class CarsService {
         relations: ['model', 'brand', 'color'],
         where,
         order,
+        skip: query.page,
+        take: query.limit,
       });
 
       return cars.map((car) => new ResponseCarDto(car));
