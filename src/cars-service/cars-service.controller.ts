@@ -6,6 +6,7 @@ import {
   Delete,
   Body,
   Param,
+  Query,
 } from '@nestjs/common';
 
 // Services
@@ -19,6 +20,7 @@ import {
   ResponseColorDto,
   ResponseBrandDto,
   ResponseModelDto,
+  CarsListQueryDto,
 } from './dto';
 
 @Controller('cars-service')
@@ -26,8 +28,8 @@ export class CarsServiceController {
   constructor(private carsService: CarsService) {}
 
   @Get('/cars')
-  getCarsList(): Promise<ResponseCarDto[]> {
-    return this.carsService.getCarsList();
+  getCarsList(@Query() query: CarsListQueryDto): Promise<ResponseCarDto[]> {
+    return this.carsService.getCarsList(query);
   }
 
   @Get('/cars/:id')

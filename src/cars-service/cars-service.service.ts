@@ -1,9 +1,22 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import {
+  Repository,
+  In,
+  Between,
+  MoreThan,
+  LessThan,
+  MoreThanOrEqual,
+  LessThanOrEqual,
+} from 'typeorm';
 
 // DTO
-import { CreateCarDto, UpdateCarDto, ResponseCarDto } from './dto';
+import {
+  CreateCarDto,
+  UpdateCarDto,
+  ResponseCarDto,
+  CarsListQueryDto,
+} from './dto';
 
 // Entities
 import { Car, Color, Brand, Model } from './entities';
@@ -18,10 +31,13 @@ export class CarsService {
     @InjectRepository(Model) private modelRepository: Repository<Model>,
   ) {}
 
-  async getCarsList(): Promise<ResponseCarDto[]> {
+  async getCarsList(query: CarsListQueryDto): Promise<ResponseCarDto[]> {
+    const where = this.getCarsListWhere(query);
+
     try {
       const cars = await this.carRepository.find({
         relations: ['model', 'brand', 'color'],
+        where,
       });
 
       return cars.map((car) => new ResponseCarDto(car));
@@ -34,6 +50,47 @@ export class CarsService {
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
+  }
+
+  private getCarsListWhere(query: CarsListQueryDto): any {
+    const { filter = {}, sort = {}, offset = null, page = null } = query;
+    const where: any = {};
+
+    const setDirectFilter = (name: string) => {
+      if (filter?.[name] !== undefined) {
+        where[name] = filter[name];
+      }
+    };
+
+    setDirectFilter('brand_id');
+    setDirectFilter('model_id');
+
+    if (filter?.color_ids !== undefined) {
+      const ids = filter.color_ids.split(',');
+
+      where.color_id = In(ids);
+    }
+
+    const setRangeFilter = (name) => {
+      if (
+        filter[`${name}_from`] !== undefined &&
+        filter[`${name}_to`] !== undefined
+      ) {
+        where[`${name}`] = Between(
+          filter[`${name}_from`],
+          filter[`${name}_to`],
+        );
+      } else if (filter[`${name}_from`] !== undefined) {
+        where[`${name}`] = MoreThanOrEqual(filter[`${name}_from`]);
+      } else if (filter[`${name}_to`] !== undefined) {
+        where[`${name}`] = LessThanOrEqual(filter[`${name}_to`]);
+      }
+    };
+
+    setRangeFilter('price_rub');
+    setRangeFilter('year');
+
+    return where;
   }
 
   async getColorsList(): Promise<ResponseColorDto[]> {
