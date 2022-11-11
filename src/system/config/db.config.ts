@@ -8,7 +8,7 @@ const DatabaseConfig = () => ({
   cli: {
     migrationsDir: 'src/system/migrations',
   },
-  synchronize: true,
+  synchronize: false,
   autoLoadEntities: true,
   entities: ['dist/**/entities/*.entity{.ts,.js}'],
   migrationsTableName: 'migrations',

@@ -1,13 +1,27 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import {
+  Repository,
+  In,
+  Between,
+  MoreThan,
+  LessThan,
+  MoreThanOrEqual,
+  LessThanOrEqual,
+} from 'typeorm';
 
 // DTO
-import { CreateCarDto, UpdateCarDto, ResponseCarDto } from './dto';
+import {
+  CreateCarDto,
+  UpdateCarDto,
+  ResponseCarDto,
+  CarsListQueryDto,
+} from './dto';
 
 // Entities
 import { Car, Color, Brand, Model } from './entities';
 import { ResponseColorDto, ResponseBrandDto, ResponseModelDto } from './dto';
+import { ListResponseDto } from '../system/dto/list-response.dto';
 
 @Injectable()
 export class CarsService {
@@ -18,13 +32,36 @@ export class CarsService {
     @InjectRepository(Model) private modelRepository: Repository<Model>,
   ) {}
 
-  async getCarsList(): Promise<ResponseCarDto[]> {
-    try {
-      const cars = await this.carRepository.find({
-        relations: ['model', 'brand', 'color'],
-      });
+  async getCarsList(
+    query: CarsListQueryDto,
+  ): Promise<ListResponseDto<ResponseCarDto>> {
+    const where = this.getCarsListWhere(query);
+    const order = this.getCarsListOrder(query);
 
-      return cars.map((car) => new ResponseCarDto(car));
+    const { page = 1, limit = 25 } = query;
+
+    try {
+      // @ts-ignore
+      const [cars, total_items]: [cars: ResponseCarDto[], count: number] =
+        await this.carRepository.findAndCount({
+          relations: ['model', 'brand', 'color'],
+          where,
+          order,
+          skip: page,
+          take: limit,
+        });
+
+      const data = cars.map((car) => new ResponseCarDto(car));
+
+      return new ListResponseDto<ResponseCarDto>({
+        data,
+        meta: {
+          page_size: limit,
+          total_items,
+          total_pages: Math.round(total_items / limit),
+          current_page: page,
+        },
+      });
     } catch (error) {
       throw new HttpException(
         {
@@ -34,6 +71,62 @@ export class CarsService {
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
+  }
+
+  private getCarsListWhere(query: CarsListQueryDto): any {
+    const { filter = {} } = query;
+    const where: any = {};
+
+    const setDirectFilter = (name: string) => {
+      if (filter?.[name] !== undefined) {
+        where[name] = filter[name];
+      }
+    };
+
+    setDirectFilter('brand_id');
+    setDirectFilter('model_id');
+
+    if (filter?.color_ids !== undefined) {
+      const ids = filter.color_ids.split(',');
+
+      where.color_id = In(ids);
+    }
+
+    const setRangeFilter = (name) => {
+      if (
+        filter[`${name}_from`] !== undefined &&
+        filter[`${name}_to`] !== undefined
+      ) {
+        where[`${name}`] = Between(
+          filter[`${name}_from`],
+          filter[`${name}_to`],
+        );
+      } else if (filter[`${name}_from`] !== undefined) {
+        where[`${name}`] = MoreThanOrEqual(filter[`${name}_from`]);
+      } else if (filter[`${name}_to`] !== undefined) {
+        where[`${name}`] = LessThanOrEqual(filter[`${name}_to`]);
+      }
+    };
+
+    setRangeFilter('price_rub');
+    setRangeFilter('year');
+
+    return where;
+  }
+
+  private getCarsListOrder(query: CarsListQueryDto): any {
+    const { sort = {} } = query;
+    const order: any = {};
+
+    const setSort = (name: string): void => {
+      if (sort[name]) {
+        order[name] = sort[name];
+      }
+    };
+    setSort('year');
+    setSort('price_rub');
+
+    return order;
   }
 
   async getColorsList(): Promise<ResponseColorDto[]> {
@@ -96,9 +189,11 @@ export class CarsService {
     }
   }
 
-  async getCarDetail(id: string): Promise<ResponseCarDto> {
+  async getCarDetail(id: string | number): Promise<ResponseCarDto> {
     try {
-      const car = await this.carRepository.findByIds([id]);
+      const car = await this.carRepository.findByIds([id], {
+        relations: ['model', 'brand', 'color'],
+      });
 
       return new ResponseCarDto(car[0]);
     } catch (error) {
@@ -117,7 +212,7 @@ export class CarsService {
       const car = await this.carRepository.create(carBody);
       const res = await this.carRepository.save(car);
 
-      return new ResponseCarDto(res);
+      return this.getCarDetail(res.id);
     } catch (error) {
       throw new HttpException(
         {

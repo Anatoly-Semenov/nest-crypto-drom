@@ -6,6 +6,7 @@ import {
   CreateDateColumn,
   ManyToOne,
   OneToMany,
+  JoinColumn,
 } from 'typeorm';
 
 import { Brand } from './brand.entity';
@@ -20,7 +21,11 @@ export class Model {
   name: string;
 
   @ManyToOne(() => Brand, (brand) => brand.model, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'brand_id' })
   brand: Brand;
+
+  @Column()
+  brand_id: number;
 
   @OneToMany(() => Car, (car) => car.model)
   cars: Car[];
