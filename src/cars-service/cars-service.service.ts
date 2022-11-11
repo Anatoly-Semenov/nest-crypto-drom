@@ -33,11 +33,13 @@ export class CarsService {
 
   async getCarsList(query: CarsListQueryDto): Promise<ResponseCarDto[]> {
     const where = this.getCarsListWhere(query);
+    const order = this.getCarsListOrder(query);
 
     try {
       const cars = await this.carRepository.find({
         relations: ['model', 'brand', 'color'],
         where,
+        order,
       });
 
       return cars.map((car) => new ResponseCarDto(car));
@@ -53,7 +55,7 @@ export class CarsService {
   }
 
   private getCarsListWhere(query: CarsListQueryDto): any {
-    const { filter = {}, sort = {}, offset = null, page = null } = query;
+    const { filter = {} } = query;
     const where: any = {};
 
     const setDirectFilter = (name: string) => {
@@ -91,6 +93,21 @@ export class CarsService {
     setRangeFilter('year');
 
     return where;
+  }
+
+  private getCarsListOrder(query: CarsListQueryDto): any {
+    const { sort = {} } = query;
+    const order: any = {};
+
+    const setSort = (name: string): void => {
+      if (sort[name]) {
+        order[name] = sort[name];
+      }
+    };
+    setSort('year');
+    setSort('price_rub');
+
+    return order;
   }
 
   async getColorsList(): Promise<ResponseColorDto[]> {
