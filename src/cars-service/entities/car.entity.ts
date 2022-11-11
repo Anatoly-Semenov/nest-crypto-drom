@@ -8,9 +8,8 @@ import {
   JoinColumn,
 } from 'typeorm';
 
-import { Brand } from './brand.entity';
-import { Model } from './model.entity';
-import { Color } from './color.entity';
+// Entities
+import { Color, Brand, Model } from './';
 
 @Entity()
 export class Car {
@@ -19,21 +18,21 @@ export class Car {
 
   @ManyToOne(() => Brand, (brand) => brand.id)
   @JoinColumn({ name: 'brand_id' })
-  brand: number;
+  brand: Brand;
 
   @Column()
   brand_id: number;
 
   @ManyToOne(() => Model, (model) => model.id)
   @JoinColumn({ name: 'model_id' })
-  model: number;
+  model: Model;
 
   @Column()
   model_id: number;
 
   @ManyToOne(() => Color, (color) => color.id)
   @JoinColumn({ name: 'color_id' })
-  color: number;
+  color: Color;
 
   @Column()
   color_id: number;

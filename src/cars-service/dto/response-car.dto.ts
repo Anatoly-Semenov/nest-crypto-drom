@@ -1,9 +1,20 @@
-import { CreateCarDto } from './create-car.dto';
+import {
+  CreateCarDto,
+  ResponseModelDto,
+  ResponseBrandDto,
+  ResponseColorDto,
+} from './';
 
 export class ResponseCarDto extends CreateCarDto {
-  created_at: Date;
+  readonly created_at?: Date;
 
-  updated_at: Date;
+  readonly updated_at?: Date;
+
+  readonly brand: ResponseBrandDto;
+
+  readonly model: ResponseModelDto;
+
+  readonly color: ResponseColorDto;
 
   constructor(partial?: Partial<ResponseCarDto>) {
     super();
