@@ -7,9 +7,6 @@ export class setCarsJoinColumnsNotNull1668424346021
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
-      `CREATE TABLE "user" ("id" SERIAL NOT NULL, "password" character varying NOT NULL, "name" character varying NOT NULL, "phone_number" character varying NOT NULL, "email" character varying NOT NULL, CONSTRAINT "PK_cace4a159ff9f2512dd42373760" PRIMARY KEY ("id"))`,
-    );
-    await queryRunner.query(
       `ALTER TABLE "car" DROP CONSTRAINT "FK_cbaa76a620e6e21773085a96bf1"`,
     );
     await queryRunner.query(
@@ -84,6 +81,5 @@ export class setCarsJoinColumnsNotNull1668424346021
     await queryRunner.query(
       `ALTER TABLE "car" ADD CONSTRAINT "FK_cbaa76a620e6e21773085a96bf1" FOREIGN KEY ("brand_id") REFERENCES "brand"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`,
     );
-    await queryRunner.query(`DROP TABLE "user"`);
   }
 }
