@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 
 // Services
-import { CarsService } from './cars-service.service';
+import { CarsService } from './cars.service';
 
 // DTO
 import {
@@ -25,7 +25,7 @@ import {
 import { ListResponseDto } from '../system/dto/list-response.dto';
 
 @Controller('cars-service')
-export class CarsServiceController {
+export class CarsController {
   constructor(private carsService: CarsService) {}
 
   @Get('/cars')
