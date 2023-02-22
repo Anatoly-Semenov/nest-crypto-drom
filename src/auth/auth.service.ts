@@ -1,37 +1,32 @@
 import {
+  BadRequestException,
   HttpException,
   HttpStatus,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { Repository } from 'typeorm';
-import { InjectRepository } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
 import dayjs, { ManipulateType } from 'dayjs';
+
+// Services
 import { JwtService } from '@nestjs/jwt';
+import { UserService } from '../user/user.service';
 
 // Models
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { User } from './entities/user.entity';
+import { CreateUserDto } from '../user/dto/create-user.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 
 // Types
-export interface Token {
-  access_token: string;
-  refresh_token: string;
-  expire_date: string;
-}
-
-type TokenResponse = Promise<Token | string>;
-type UserId = string | number;
+import { UserId } from '../user/user.service';
+import { Token } from './types/token.interface';
+import { TokenResponse } from './types/token-response.type';
 
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectRepository(User) private userRepository: Repository<User>,
     private configService: ConfigService,
+    private userService: UserService,
     private jwtService: JwtService,
   ) {}
 
@@ -49,7 +44,7 @@ export class AuthService {
     phone_number: string,
     password: string,
   ): TokenResponse {
-    const candidate = await this.userRepository.findOne({ phone_number });
+    const candidate = await this.userService.getUser({ phone_number });
 
     if (!candidate) {
       return `There is no user with phone number ${phone_number} in the system`;
@@ -63,7 +58,7 @@ export class AuthService {
   }
 
   async loginByEmail(email: string, password: string): TokenResponse {
-    const candidate = await this.userRepository.findOne({ email });
+    const candidate = await this.userService.getUser({ email });
 
     if (!candidate) {
       return `There is no user with email ${email} in the system`;
@@ -118,21 +113,25 @@ export class AuthService {
     };
   }
 
-  async registration(user: CreateUserDto): Promise<string> {
+  async registration(user: CreateUserDto): Promise<Token> {
     const { phone_number, email, password } = user;
 
     try {
       if (phone_number) {
-        const candidate = await this.userRepository.findOne({ phone_number });
+        const candidate = await this.userService.getUser({ phone_number });
 
         if (candidate) {
-          return `User with phone number ${phone_number} already exists`;
+          throw new BadRequestException(
+            `User with phone number ${phone_number} already exists`,
+          );
         }
       } else if (email) {
-        const candidate = await this.userRepository.findOne({ email });
+        const candidate = await this.userService.getUser({ email });
 
         if (candidate) {
-          return `User with email ${email} already exists`;
+          throw new BadRequestException(
+            `User with email ${email} already exists`,
+          );
         }
       }
 
@@ -140,7 +139,7 @@ export class AuthService {
       const bcryptPassword: string = await bcrypt.hash(password, 7);
 
       // Create user
-      const newUser = await this.userRepository.create(
+      const user = await this.userService.createUser(
         new CreateUserDto({
           phone_number,
           email,
@@ -148,12 +147,8 @@ export class AuthService {
         }),
       );
 
-      await this.userRepository.save(newUser);
-
-      return 'Succesful create new user';
+      return this.generateToken(user.id);
     } catch (error: any) {
-      console.log(error);
-
       throw new HttpException(
         {
           status: HttpStatus.INTERNAL_SERVER_ERROR,
@@ -161,28 +156,6 @@ export class AuthService {
         },
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
-    }
-  }
-
-  async getAllUsers() {
-    try {
-      return await this.userRepository.find();
-    } catch (e) {
-      throw e;
-    }
-  }
-
-  async getUserById(id: UserId) {
-    try {
-      const [user] = await this.userRepository.findByIds([id]);
-
-      if (user) {
-        return user;
-      } else {
-        return `User with id ${id} is undefined`;
-      }
-    } catch (e) {
-      throw `User with id ${id} is undefined`;
     }
   }
 
@@ -202,26 +175,6 @@ export class AuthService {
       throw new UnauthorizedException();
     } catch (e) {
       throw new UnauthorizedException();
-    }
-  }
-
-  async updateUserById(id: number, updateUserDto: UpdateUserDto) {
-    try {
-      await this.userRepository.update(id, updateUserDto);
-
-      return `User with ${id} successful updated`;
-    } catch (e) {
-      throw `Failed update user with id: ${id}`;
-    }
-  }
-
-  async deleteUserById(id: number) {
-    try {
-      await this.userRepository.delete(id);
-
-      return `User with ${id} successful deleted`;
-    } catch (e) {
-      throw `Failed delete user with id: ${id}`;
     }
   }
 }

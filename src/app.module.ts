@@ -5,6 +5,7 @@ import { AppService } from './app.service';
 import { CarsModule } from './cars/cars.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
+import { UserModule } from './user/user.module';
 import MainConfig from './system/config/main.config';
 
 @Module({
@@ -20,6 +21,7 @@ import MainConfig from './system/config/main.config';
     }),
     CarsModule,
     AuthModule,
+    UserModule,
   ],
   controllers: [AppController],
   providers: [AppService],
