@@ -1,15 +1,14 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtModule } from '@nestjs/jwt';
 
-import { AuthService } from './auth-service.service';
-import { AuthServiceController } from './auth-service.controller';
-import { User } from './entities/user.entity';
+import { AuthService } from './auth.service';
+import { AuthController } from './auth.controller';
 import { JwtStrategy } from './strategies/jwt.strategy';
+import { UserModule } from '../user/user.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User]),
+    UserModule,
     JwtModule.register({
       secret: process.env.JWT_SECRET_KEY || 'secret',
       signOptions: {
@@ -18,7 +17,7 @@ import { JwtStrategy } from './strategies/jwt.strategy';
     }),
   ],
   exports: [AuthService],
-  controllers: [AuthServiceController],
+  controllers: [AuthController],
   providers: [AuthService, JwtStrategy],
 })
-export class AuthServiceModule {}
+export class AuthModule {}
