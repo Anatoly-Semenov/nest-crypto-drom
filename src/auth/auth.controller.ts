@@ -10,14 +10,14 @@ import {
 } from '@nestjs/common';
 
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
-import { AuthService } from './auth-service.service';
+import { AuthService } from './auth.service';
 
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 
 @Controller('auth-service')
-export class AuthServiceController {
+export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('login')

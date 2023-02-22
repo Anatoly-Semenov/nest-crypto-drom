@@ -4,7 +4,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { CarsServiceModule } from './cars-service/cars-service.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AuthServiceModule } from './auth-service/auth-service.module';
+import { AuthModule } from './auth/auth.module';
 import MainConfig from './system/config/main.config';
 
 @Module({
@@ -19,7 +19,7 @@ import MainConfig from './system/config/main.config';
       useFactory: (config: ConfigService) => config.get('database'),
     }),
     CarsServiceModule,
-    AuthServiceModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
