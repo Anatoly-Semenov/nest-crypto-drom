@@ -22,6 +22,14 @@ export class UserService {
     }
   }
 
+  async getMe(user): Promise<User[] | any> {
+    if (user) {
+      return user;
+    } else {
+      throw new BadRequestException('Failed to get your user');
+    }
+  }
+
   async getUser(fields: Partial<UserInterface>): Promise<User> {
     try {
       return await this.userRepository.findOne(fields);

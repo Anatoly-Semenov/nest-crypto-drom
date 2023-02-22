@@ -11,6 +11,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { UserService } from './user.service';
 
 import { UpdateUserDto } from './dto/update-user.dto';
+import { GetUser } from './decorators/get-user.decorator';
 
 @Controller('user-service')
 export class UserController {
@@ -20,6 +21,12 @@ export class UserController {
   @Get('users')
   findAll() {
     return this.userService.getAllUsers();
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('users/me')
+  findMe(@GetUser() user) {
+    return this.userService.getMe(user);
   }
 
   @UseGuards(JwtAuthGuard)
