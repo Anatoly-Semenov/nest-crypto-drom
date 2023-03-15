@@ -6,6 +6,7 @@ import { CarsModule } from './cars/cars.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
+import { ArticlesModule } from './articles/articles.module';
 import MainConfig from './system/config/main.config';
 
 @Module({
@@ -22,6 +23,7 @@ import MainConfig from './system/config/main.config';
     CarsModule,
     AuthModule,
     UserModule,
+    ArticlesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
