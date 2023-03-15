@@ -1,4 +1,13 @@
-import { PartialType } from '@nestjs/swagger';
-import { CreateArticleDto } from './create-article.dto';
+export class UpdateArticleDto {
+  title: string;
 
-export class UpdateArticleDto extends PartialType(CreateArticleDto) {}
+  sub_title: string;
+
+  content: string;
+
+  constructor(partial?: Partial<UpdateArticleDto>) {
+    if (partial) {
+      Object.assign(this, partial);
+    }
+  }
+}
