@@ -69,7 +69,7 @@ export class UserController {
   @ApiResponse({
     status: 200,
     description: 'Delete user.',
-    type: ResponseUserDto,
+    type: String,
   })
   @UseGuards(JwtAuthGuard)
   delete(@Param('id') id: string) {
