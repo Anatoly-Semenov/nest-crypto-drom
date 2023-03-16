@@ -13,7 +13,7 @@ export class AuthController {
   @Post('login')
   @ApiResponse({
     status: 200,
-    description: 'Login by phone_number of email.',
+    description: 'Login by phone_number or email.',
     type: ResponseTokenDto,
   })
   login(@Body() CreateUserDto: CreateUserDto) {
