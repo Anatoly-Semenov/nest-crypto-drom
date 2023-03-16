@@ -1,23 +1,20 @@
 import { Type } from 'class-transformer';
-import { IsOptional } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
-export class CreateUserDto {
+export class ResponseTokenDto {
   @ApiProperty()
-  @IsOptional()
   @Type(() => String)
-  phone_number: string;
-
-  @ApiProperty()
-  @IsOptional()
-  @Type(() => String)
-  email: string;
+  access_token: string;
 
   @ApiProperty()
   @Type(() => String)
-  password: string;
+  refresh_token: string;
 
-  constructor(partial?: Partial<CreateUserDto>) {
+  @ApiProperty()
+  @Type(() => String)
+  expire_date: string;
+
+  constructor(partial?: Partial<ResponseTokenDto>) {
     if (partial) {
       Object.assign(this, partial);
     }
