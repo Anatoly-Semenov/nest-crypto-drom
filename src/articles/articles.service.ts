@@ -23,10 +23,10 @@ export class ArticlesService {
   }
 
   async getArticleById(id: number): Promise<Article> {
-    const errorText: string = `Failed to user with id: ${id}`;
+    const errorText: string = `Failed to get article with id: ${id}`;
 
     try {
-      const articles = await this.articleRepository.findByIds([id])[0];
+      const articles = await this.articleRepository.findByIds([id]);
 
       if (!articles && articles?.[0]) {
         throw new BadRequestException(errorText);
